@@ -1,0 +1,69 @@
+#===============================================================================
+#
+#          FILE:  EuroForMix.def
+#
+#   DESCRIPTION:  EuroForMix and Casesolver Singularity Container Recipe File
+#
+#        AUTHOR:  Adam Michaleas, adam.michaleas@ll.mit.edu
+#        AUTHOR:  Philip Fremont-Smith, philip.fremont-smith@ll.mit.edu
+#        AUTHOR:  Darrell Ricke, darrell.ricke@ll.mit.edu
+#       COMPANY:  MIT Lincoln Laboratory
+#       VERSION:  1.0
+#       CREATED:  01/08/2020 13:30 PM EDT
+#      REVISION:  ---
+#===============================================================================
+
+# DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
+
+#This material is based upon work supported by the United States Air Force under Air Force Contract No. FA8702-15-D-0001. Any opinions, findings, conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the United States Air Force.
+
+#© 2019 Massachusetts Institute of Technology.
+
+#The software/firmware is provided to you on an As-Is basis
+
+#Delivered to the U.S. Government with Unlimited Rights, as defined in DFARS Part 252.227-7013 or 7014 (Feb 2014). Notwithstanding any copyright notice, U.S. Government rights in this work are defined by DFARS 252.227-7013 or DFARS 252.227-7014 as detailed above. Use of this work other than as specifically authorized by the U.S. Government may violate any copyrights that exist in this work.
+
+Bootstrap: library
+From: centos:7
+
+%setup
+  # The ${SINGULARITY_ROOTFS} is key to make these directories in the correct location.
+  mkdir -p ${SINGULARITY_ROOTFS}/usr/local
+  mkdir -p ${SINGULARITY_ROOTFS}/data
+
+%files
+  # Copy local files to the Singularity container [From To]
+  # data/*     data/
+
+    data/casesolver_1.5.0.zip /data/
+    data/euroformix_automated_v2.tar /data/
+    data/euroformix_install.sh /data/
+    data/euroformix-master.zip /data/
+    data/R-3.6.2.tar.gz /data/
+
+%post
+  echo "The post section has executed"
+  yum install -y epel-release
+  yum update -y
+  yum install -y vim python3 git make gcc zlib zlib-devel g++ wget libcurl libcurl-devel xorg-x11-xauth xorg-x11-server-devel libX11-devel libXt-devel chromedriver chromium xorg-x11-server-Xvfb tk tcl tk-devel tcl-devel
+  yum groupinstall -y "Development Tools"
+  yum install -y kernel-headers kernel-devel
+  yum install -y readline readline-devel
+  yum install -y bzip2 bzip2-devel
+  yum install -y xz-lzma-compat lzip pxz xz xz-devel xz-libs
+  yum install -y pcre pcre2 pcre-devel pcre2-devel pcre2-static pcre2-tools
+  yum install -y libcurl libcurl-devel
+  yum install -y pango pango-devel pangomm pangomm-devel
+  cd /data && ./euroformix_install.sh 
+
+%runscript
+  exec echo "The runscript has executed!"
+
+%environment
+  export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+  export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
+
+%help
+
+  This is the help section!
+
